@@ -19,11 +19,30 @@ from subprocess import check_output, check_call
 # development with these warnings a nightmare. This is intended to be
 # community driven, do not hesitate to submit a PR if you feel one setting
 # should have a stricter or looser default value.
+#
+# See https://pewpewthespells.com/blog/buildsettings.html for a description
+# of each setting effect.
 STRICT_DEFAULTS_EXCEPTIONS = {
+    # https://openradar.appspot.com/radar?id=5907704967069696
     'CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK': 'NO',
+
+    # It's sometime useful to test a few things in debug build
+    # Maybe use `YES` for release builds
     'GCC_TREAT_WARNINGS_AS_ERRORS': 'NO',
+
+    # Doesn't play nice with Apple Frameworks
     'GCC_WARN_PEDANTIC': 'NO',
+
+    # Don't need that with Objective-C 2.0
     'CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS': 'NO',
+
+    # Probably a bit controversial, but not uncommon to ignore some parameters
+    # in Apple delegates methods
+    'GCC_WARN_UNUSED_PARAMETER': 'NO',
+}
+
+###############################################################################
+
 # Those are settings where 'YES' is not the most aggressive value
 AGGRESSIVE_DEFAULTS_EXCEPTIONS = {
     'GCC_WARN_INHIBIT_ALL_WARNINGS': 'NO'
