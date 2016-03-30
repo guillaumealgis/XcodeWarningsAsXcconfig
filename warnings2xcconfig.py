@@ -24,6 +24,9 @@ STRICT_DEFAULTS_EXCEPTIONS = {
     'GCC_TREAT_WARNINGS_AS_ERRORS': 'NO',
     'GCC_WARN_PEDANTIC': 'NO',
     'CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS': 'NO',
+# Those are settings where 'YES' is not the most aggressive value
+AGGRESSIVE_DEFAULTS_EXCEPTIONS = {
+    'GCC_WARN_INHIBIT_ALL_WARNINGS': 'NO'
 }
 
 
@@ -83,6 +86,9 @@ class XcspecOption(object):
 
     @property
     def aggressive_default_value(self):
+        if self.name in AGGRESSIVE_DEFAULTS_EXCEPTIONS:
+            return AGGRESSIVE_DEFAULTS_EXCEPTIONS[self.name]
+
         if self.type == 'Boolean':
             return 'YES'
         elif self.type == 'Enumeration':
