@@ -1,8 +1,12 @@
 # Xcode Warnings to .xcconfig
 
-warnings2xcconfig is a tool to extract compiler and static analyzer warning flags from Xcode and format them into a xcconfig file you can use in your projects.
+warnings2xcconfig is a tool to extract compiler and static analyzer warning flags from Xcode and format them into [a xcconfig file you can use in your projects](http://www.jontolof.com/cocoa/using-xcconfig-files-for-you-xcode-project/).
 
 It provides sensible defaults for each flag so you can get as much help from the compiler as possible.
+
+## Ready-to-use xcconfig files
+
+You can find pre-generated xcconfig files for your version of Xcode in the `Xcode-*` folders. Each folder contains a few xcconfig files with differents default settings (one per `--defaults` option, see "Usage" for what each option means).
 
 ## Usage
 
