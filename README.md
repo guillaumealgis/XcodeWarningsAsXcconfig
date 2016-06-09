@@ -78,7 +78,7 @@ The hand-picked values for the `--defaults strict` flag are really open to chang
 This project is largely inpired from other great xcconfig projects and blog posts:
 
 - [https://github.com/jonreid/XcodeWarnings](https://github.com/jonreid/XcodeWarnings)
-- [https://github.com/tewha/MoreWarnings-xcconfig](https://github.com/jonreid/XcodeWarnings)
+- [https://github.com/tewha/MoreWarnings-xcconfig](https://github.com/tewha/MoreWarnings-xcconfig)
 - [http://www.jontolof.com/cocoa/using-xcconfig-files-for-you-xcode-project/](http://www.jontolof.com/cocoa/using-xcconfig-files-for-you-xcode-project/)
 
 ## Author
