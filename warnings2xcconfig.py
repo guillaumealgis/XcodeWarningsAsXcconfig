@@ -117,10 +117,13 @@ class XcspecOption(object):
                 return 'YES_AGGRESSIVE'
             elif 'YES_ERROR' in self.values:
                 return 'YES_ERROR'
+            elif set(self.values) == set(['YES', 'YES_NONAGGRESSIVE', 'NO']):
+                return 'YES'
             elif set(self.values) == set(['shallow', 'deep']):
                 return 'deep'
-        raise Exception('Unknown aggressive value for {} ({})'
-                        .format(self.name, self.type))
+        raise Exception('Unknown aggressive value for {} (Type : {};'
+                        ' Values : {})'
+                        .format(self.name, self.type, self.values))
 
     def _default_value_for_style(self, style):
         if style == 'clang':
