@@ -45,7 +45,8 @@ STRICT_DEFAULTS_EXCEPTIONS = {
 
 # Those are settings where 'YES' is not the most aggressive value
 AGGRESSIVE_DEFAULTS_EXCEPTIONS = {
-    'GCC_WARN_INHIBIT_ALL_WARNINGS': 'NO'
+    'GCC_WARN_INHIBIT_ALL_WARNINGS': 'NO',
+    'SWIFT_SUPPRESS_WARNINGS': 'NO',
 }
 
 
@@ -280,6 +281,9 @@ def parse_script_args():
              'being too much of a hassle to fix\n'
              '  - aggressive: everything \'on\' (you probably don\'t want this)')
     parser.add_argument(
+        '--no-swift', dest='swift', action='store_false',
+        help='don\'t include Swift-related flags in the output')
+    parser.add_argument(
         '--doc', action='store_true',
         help='include documentation about the options in the generated '
              'xcconfig file, if available')
@@ -296,21 +300,29 @@ def parse_script_args():
     return args
 
 
-def clang_llvm_xcspec_path(xcode_path):
-    XCODE_REL_CLANG_LLVM_XCSPEC_PATH = 'Contents/PlugIns/Xcode3Core.ideplugin/Contents/SharedSupport/Developer/Library/Xcode/Plug-ins/Clang LLVM 1.0.xcplugin/Contents/Resources/Clang LLVM 1.0.xcspec'
-    clang_llvm_xcspec_path = path.join(xcode_path,
-                                       XCODE_REL_CLANG_LLVM_XCSPEC_PATH)
-    return clang_llvm_xcspec_path
+def xcspec_path(xcode_path, xcplugin, xcspec=None):
+    if not xcspec:
+        xcspec = xcplugin
+
+    path_template = 'Contents/PlugIns/Xcode3Core.ideplugin/Contents/SharedSupport/Developer/Library/Xcode/Plug-ins/{}.xcplugin/Contents/Resources/{}.xcspec'
+    rel_path = path_template.format(xcplugin, xcspec)
+    full_path = path.join(xcode_path, rel_path)
+
+    return full_path
 
 
 def main():
     args = parse_script_args()
 
-    xcspec_path = clang_llvm_xcspec_path(args.xcode_path)
+    clang_llvm_xcspec_path = xcspec_path(args.xcode_path, 'Clang LLVM 1.0')
+    clang_llvm_parser = XSpecParser(clang_llvm_xcspec_path)
+    options_groups = clang_llvm_parser.parse_options('com.apple.compilers.llvm.clang.1_0.compiler', category_filter=r'^Warning')
+    options_groups += clang_llvm_parser.parse_options('com.apple.compilers.llvm.clang.1_0.analyzer')
 
-    parser = XSpecParser(xcspec_path)
-    options_groups = parser.parse_options('com.apple.compilers.llvm.clang.1_0.compiler', category_filter=r'^Warning')
-    options_groups += parser.parse_options('com.apple.compilers.llvm.clang.1_0.analyzer')
+    if args.swift:
+        swift_xcspec_path = xcspec_path(args.xcode_path, 'XCLanguageSupport', 'Swift')
+        swift_parser = XSpecParser(swift_xcspec_path)
+        options_groups += swift_parser.parse_options('com.apple.xcode.tools.swift.compiler', category_filter=r'^Warning')
 
     import_xcode_defaults_into_options(args.xcode_path, options_groups)
 
