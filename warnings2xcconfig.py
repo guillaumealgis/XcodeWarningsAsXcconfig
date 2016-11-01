@@ -247,7 +247,7 @@ def import_xcode_defaults_into_options(xcode_path, options_groups):
 
 def format_xcspec_options_groups_as_xcconfig(options_groups, default_values=None, add_doc=False):
     xcconfig = '// Generated using XcodeWarningsAsXcconfig\n'
-    xcconfig += '// https://github.com/guillaume-algis/XcodeWarningsAsXcconfig\n'
+    xcconfig += '// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig\n'
     xcconfig += '\n'
 
     for options_group in options_groups:
