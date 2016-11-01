@@ -231,7 +231,7 @@ class XSpecParser(object):
 
 
 def import_xcode_defaults_into_options(xcode_path, options_groups):
-    XCODE_REL_PROJECT_TEMPLATE_INFO_PATH = 'Contents/Developer/Library/Xcode/Templates/Project Templates/Base/Base.xctemplate/TemplateInfo.plist'
+    XCODE_REL_PROJECT_TEMPLATE_INFO_PATH = 'Contents/Developer/Library/Xcode/Templates/Project Templates/Base/Base_ProjectSettings.xctemplate/TemplateInfo.plist'
     xcode_template_path = path.join(xcode_path,
                                     XCODE_REL_PROJECT_TEMPLATE_INFO_PATH)
     xcode_template_info = plistlib.readPlist(xcode_template_path)
