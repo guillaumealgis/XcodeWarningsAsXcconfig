@@ -294,6 +294,7 @@ def parse_script_args():
     if args.xcode_path is None:
         xcode_path = check_output(['xcode-select', '-p'])
         xcode_path = xcode_path.strip()
+        # import ipdb; ipdb.set_trace(context=5)
         xcode_path = xcode_path.replace('/Contents/Developer', '')
         args.xcode_path = xcode_path
 
@@ -327,6 +328,7 @@ def main():
     import_xcode_defaults_into_options(args.xcode_path, options_groups)
 
     print(format_xcspec_options_groups_as_xcconfig(options_groups, default_values=args.defaults, add_doc=args.doc))
+
 
 if __name__ == "__main__":
     main()
