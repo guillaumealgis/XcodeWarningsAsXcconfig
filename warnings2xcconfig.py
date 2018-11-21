@@ -49,6 +49,11 @@ AGGRESSIVE_DEFAULTS_EXCEPTIONS = {
     'SWIFT_SUPPRESS_WARNINGS': 'NO',
 }
 
+XCODE_REL_PROJECT_TEMPLATE_INFO_PATH = ('Contents/Developer/Library/Xcode/'
+                                        'Templates/Project Templates/Base/'
+                                        'Base_ProjectSettings.xctemplate/'
+                                        'TemplateInfo.plist')
+
 
 class XcspecOptionsGroup(object):
     def __init__(self, tool_name, group_name):
@@ -81,12 +86,15 @@ class XcspecOptionsGroup(object):
         return name
 
     def format_as_xcconfig(self, default_values=None, add_doc=False):
-        s = '// {}\n'.format(self.display_name)
+        xcconfig_string = '// {}\n'.format(self.display_name)
 
         for option in self.options:
-            s += option.format_as_xcconfig(default_values=default_values, add_doc=add_doc)
+            xcconfig_string += option.format_as_xcconfig(
+                default_values=default_values,
+                add_doc=add_doc
+            )
 
-        return s
+        return xcconfig_string
 
 
 class XcspecOption(object):
@@ -109,22 +117,37 @@ class XcspecOption(object):
         if self.name in AGGRESSIVE_DEFAULTS_EXCEPTIONS:
             return AGGRESSIVE_DEFAULTS_EXCEPTIONS[self.name]
 
+        default_value = None
         if self.type == 'Boolean':
-            return 'YES'
+            default_value = self.aggressive_default_bool_value()
         elif self.type == 'Enumeration':
-            if self.values == ['YES', 'NO']:
-                return 'YES'
-            elif 'YES_AGGRESSIVE' in self.values:
-                return 'YES_AGGRESSIVE'
-            elif 'YES_ERROR' in self.values:
-                return 'YES_ERROR'
-            elif set(self.values) == set(['YES', 'YES_NONAGGRESSIVE', 'NO']):
-                return 'YES'
-            elif set(self.values) == set(['shallow', 'deep']):
-                return 'deep'
-        raise Exception('Unknown aggressive value for {} (Type : {};'
-                        ' Values : {})'
-                        .format(self.name, self.type, self.values))
+            default_value = self.aggressive_default_enum_value(self.values)
+
+        if default_value is None:
+            msg = ('Unknown default value for {} (Type : {}; Values : {})'
+                   .format(self.name, self.type, self.values))
+            raise NotImplementedError(msg)
+
+        return default_value
+
+    @staticmethod
+    def aggressive_default_bool_value():
+        return 'YES'
+
+    @staticmethod
+    def aggressive_default_enum_value(values):
+        if values == ['YES', 'NO']:
+            return 'YES'
+        elif 'YES_AGGRESSIVE' in values:
+            return 'YES_AGGRESSIVE'
+        elif 'YES_ERROR' in values:
+            return 'YES_ERROR'
+        elif set(values) == set(['YES', 'YES_NONAGGRESSIVE', 'NO']):
+            return 'YES'
+        elif set(values) == set(['shallow', 'deep']):
+            return 'deep'
+
+        return None
 
     def _default_value_for_style(self, style):
         if style == 'clang':
@@ -177,13 +200,13 @@ class XSpecParser(object):
     def __exit__(self, exc_type, exc_value, traceback):
         self._xcspec_file.close()
 
-    def _open_xcspec(self, xcspec_path):
+    def _open_xcspec(self, file_path):
         self._xcspec_file = tempfile.NamedTemporaryFile()
 
         # Apple uses the old NeXTSTEP format for its xcspec, convert it to
         # xml with plutil
-        check_call(['plutil', '-convert', 'xml1', xcspec_path, '-o',
-                    self._xcspec_file.name])
+        check_call(['plutil', '-convert', 'xml1', file_path,
+                    '-o', self._xcspec_file.name])
 
         self.xcspec_root = plistlib.readPlist(self._xcspec_file)
 
@@ -234,8 +257,7 @@ class XSpecParser(object):
         return options_groups.values()
 
 
-def import_xcode_defaults_into_options(xcode_path, options_groups):
-    XCODE_REL_PROJECT_TEMPLATE_INFO_PATH = 'Contents/Developer/Library/Xcode/Templates/Project Templates/Base/Base_ProjectSettings.xctemplate/TemplateInfo.plist'
+def load_xcode_defaults(xcode_path, options_groups):
     xcode_template_path = path.join(xcode_path,
                                     XCODE_REL_PROJECT_TEMPLATE_INFO_PATH)
     xcode_template_info = plistlib.readPlist(xcode_template_path)
@@ -249,13 +271,17 @@ def import_xcode_defaults_into_options(xcode_path, options_groups):
             option.xcode_default_value = xcode_defaults[option.name]
 
 
-def format_xcspec_options_groups_as_xcconfig(options_groups, default_values=None, add_doc=False):
+def xcspec_optgroups_as_xcconfig(options_groups, default_values=None,
+                                 add_doc=False):
     xcconfig = '// Generated using XcodeWarningsAsXcconfig\n'
     xcconfig += '// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig\n'
     xcconfig += '\n'
 
     for options_group in options_groups:
-        xcconfig += options_group.format_as_xcconfig(default_values=default_values, add_doc=add_doc)
+        xcconfig += options_group.format_as_xcconfig(
+            default_values=default_values,
+            add_doc=add_doc
+        )
         xcconfig += '\n'
 
     return xcconfig
@@ -279,7 +305,8 @@ def parse_script_args():
              '  - xcode: defaults used by xcode when creating a new project\n'
              '  - strict: hand picked values to make your code safer without '
              'being too much of a hassle to fix\n'
-             '  - aggressive: everything \'on\' (you probably don\'t want this)')
+             '  - aggressive: everything \'on\' '
+             '(you probably don\'t want this)')
     parser.add_argument(
         '--no-swift', dest='swift', action='store_false',
         help='don\'t include Swift-related flags in the output')
@@ -305,7 +332,9 @@ def xcspec_path(xcode_path, xcplugin, xcspec=None):
     if not xcspec:
         xcspec = xcplugin
 
-    path_template = 'Contents/PlugIns/Xcode3Core.ideplugin/Contents/SharedSupport/Developer/Library/Xcode/Plug-ins/{}.xcplugin/Contents/Resources/{}.xcspec'
+    path_template = ('Contents/PlugIns/Xcode3Core.ideplugin/Contents/'
+                     'SharedSupport/Developer/Library/Xcode/Plug-ins/'
+                     '{}.xcplugin/Contents/Resources/{}.xcspec')
     rel_path = path_template.format(xcplugin, xcspec)
     full_path = path.join(xcode_path, rel_path)
 
@@ -317,17 +346,32 @@ def main():
 
     clang_llvm_xcspec_path = xcspec_path(args.xcode_path, 'Clang LLVM 1.0')
     clang_llvm_parser = XSpecParser(clang_llvm_xcspec_path)
-    options_groups = clang_llvm_parser.parse_options('com.apple.compilers.llvm.clang.1_0.compiler', category_filter=r'^Warning')
-    options_groups += clang_llvm_parser.parse_options('com.apple.compilers.llvm.clang.1_0.analyzer')
+    options_groups = clang_llvm_parser.parse_options(
+        'com.apple.compilers.llvm.clang.1_0.compiler',
+        category_filter=r'^Warning'
+    )
+    options_groups += clang_llvm_parser.parse_options(
+        'com.apple.compilers.llvm.clang.1_0.analyzer'
+    )
 
     if args.swift:
-        swift_xcspec_path = xcspec_path(args.xcode_path, 'XCLanguageSupport', 'Swift')
+        swift_xcspec_path = xcspec_path(
+            args.xcode_path, 'XCLanguageSupport', 'Swift'
+        )
         swift_parser = XSpecParser(swift_xcspec_path)
-        options_groups += swift_parser.parse_options('com.apple.xcode.tools.swift.compiler', category_filter=r'^Warning')
+        options_groups += swift_parser.parse_options(
+            'com.apple.xcode.tools.swift.compiler',
+            category_filter=r'^Warning'
+        )
 
-    import_xcode_defaults_into_options(args.xcode_path, options_groups)
+    load_xcode_defaults(args.xcode_path, options_groups)
 
-    print(format_xcspec_options_groups_as_xcconfig(options_groups, default_values=args.defaults, add_doc=args.doc))
+    xcconfig = xcspec_optgroups_as_xcconfig(
+        options_groups,
+        default_values=args.defaults,
+        add_doc=args.doc
+    )
+    print(xcconfig)
 
 
 if __name__ == "__main__":
