@@ -4,10 +4,11 @@
 from __future__ import (unicode_literals, absolute_import, division,
                         print_function)
 
-import tempfile
-import plistlib
 import argparse
+import itertools
+import plistlib
 import re
+import tempfile
 from os import path
 
 from subprocess import check_output, check_call
@@ -49,15 +50,32 @@ AGGRESSIVE_DEFAULTS_EXCEPTIONS = {
     'SWIFT_SUPPRESS_WARNINGS': 'NO',
 }
 
+# Clang Analyzer flags which are either too noisy, returns too much
+# false-positives, or are already included in Xcode build settings
+IGNORED_CLANG_ANALYZER_FLAGS = [
+    # Too much false positives
+    'alpha.clone.CloneChecker',
+    'alpha.deadcode.UnreachableCode',
+]
+
 XCODE_REL_PROJECT_TEMPLATE_INFO_PATH = ('Contents/Developer/Library/Xcode/'
                                         'Templates/Project Templates/Base/'
                                         'Base_ProjectSettings.xctemplate/'
                                         'TemplateInfo.plist')
 
 
+# Grabbed from https://stackoverflow.com/a/20037408/404321
+def flatmap(func, *iterable):
+    return itertools.chain.from_iterable(map(func, *iterable))
+
+
+# Grabbed from https://stackoverflow.com/a/953097/404321
+def flatten(list_of_lists):
+    return list(itertools.chain.from_iterable(list_of_lists))
+
+
 class XcspecOptionsGroup(object):
     def __init__(self, tool_name, group_name):
-        super(XcspecOptionsGroup, self).__init__()
         self.tool_name = tool_name
         self.group_name = group_name
         self.options = []
@@ -85,11 +103,11 @@ class XcspecOptionsGroup(object):
 
         return name
 
-    def format_as_xcconfig(self, default_values=None, add_doc=False):
+    def format_for_xcconfig(self, default_values=None, add_doc=False):
         xcconfig_string = '// {}\n'.format(self.display_name)
 
         for option in self.options:
-            xcconfig_string += option.format_as_xcconfig(
+            xcconfig_string += option.format_for_xcconfig(
                 default_values=default_values,
                 add_doc=add_doc
             )
@@ -99,7 +117,6 @@ class XcspecOptionsGroup(object):
 
 class XcspecOption(object):
     def __init__(self, xcspec_dict):
-        super(XcspecOption, self).__init__()
         self.from_xspec_dict(xcspec_dict)
         self.xcode_default_value = None
         self.strict_default_value = None
@@ -111,6 +128,7 @@ class XcspecOption(object):
         self.type = xcspec_dict['Type']
         self.values = xcspec_dict.get('Values')
         self.clang_default_value = xcspec_dict.get('DefaultValue')
+        self.command_line_args = xcspec_dict.get('CommandLineArgs')
 
     @property
     def aggressive_default_value(self):
@@ -179,13 +197,25 @@ class XcspecOption(object):
 
         return value
 
-    def format_as_xcconfig(self, default_values=None, add_doc=False):
+    @property
+    def clang_analyzer_flags(self):
+        if not self.command_line_args:
+            return []
+
+        args = flatten(self.command_line_args.values())
+        flags = [arg for arg in args if not arg.startswith('-')]
+
+        return flags
+
+    def format_for_xcconfig(self, default_values=None, add_doc=False):
         value = self._default_value_for_style(default_values)
 
         opt_str = ''
 
         if add_doc and self.description:
-            opt_str += '// {}: {}\n'.format(self.display_name, self.description)
+            name = self.display_name
+            doc = self.description
+            opt_str += '// {}: {}\n'.format(name, doc)
 
         opt_str += '{} = {}\n'.format(self.name, value)
 
@@ -194,7 +224,6 @@ class XcspecOption(object):
 
 class XSpecParser(object):
     def __init__(self, filepath):
-        super(XSpecParser, self).__init__()
         self._open_xcspec(filepath)
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -257,6 +286,92 @@ class XSpecParser(object):
         return options_groups.values()
 
 
+class ClangAnalyzerFlag(object):
+    def __init__(self, name, doc=None):
+        self.name = name
+        self.doc = doc
+
+    def format_for_xcconfig(self):
+        flag_str = '-Xclang -analyzer-checker -Xclang {}'.format(self.name)
+        return flag_str
+
+
+class ClangHelpParser(object):
+    def __init__(self, clang_bin_path, all_xspec_options=None):
+        self.clang_bin_path = clang_bin_path
+
+        # Extract the command line flags from all build settings we already
+        # have so we don't repeat the same options twice when building
+        if all_xspec_options:
+            self.skipped_flags = list(flatmap(
+                lambda opt: opt.clang_analyzer_flags,
+                all_xspec_options
+            ))
+        else:
+            self.skipped_flags = []
+
+        self.found_checkers = False
+        self.partial_flag = None
+        self.flags = []
+
+    def parse_help(self):
+        clang_help = check_output([
+            self.clang_bin_path, '-cc1', '-analyzer-checker-help'
+        ])
+
+        for line in clang_help.splitlines():
+            self.parse_line(line)
+
+        return self.flags
+
+    def parse_line(self, line):
+        if line.startswith('CHECKERS'):
+            self.found_checkers = True
+            return
+
+        if not self.found_checkers:
+            return
+
+        if self.partial_flag:
+            flag = self.parse_doc_line(line)
+        else:
+            flag = self.parse_new_flag_line(line)
+
+        if flag and self.is_flag_valid(flag):
+            self.flags.append(flag)
+
+    def parse_doc_line(self, line):
+        self.partial_flag.doc = line.strip()
+        flag = self.partial_flag
+        self.partial_flag = None
+        return flag
+
+    def parse_new_flag_line(self, line):
+        bits = line.split(None, 1)
+        bits = [bit for bit in bits if bit != '']
+
+        if len(bits) == 1:
+            name = bits[0]
+            self.partial_flag = ClangAnalyzerFlag(name)
+            return None
+
+        name, doc = bits
+        flag = ClangAnalyzerFlag(name, doc)
+        return flag
+
+    def is_flag_valid(self, flag):
+        if flag.name.startswith('debug.'):
+            return False
+
+        if flag.name in IGNORED_CLANG_ANALYZER_FLAGS:
+            return False
+
+        if flag.name in self.skipped_flags:
+            return False
+
+        return True
+
+
 def load_xcode_defaults(xcode_path, options_groups):
     xcode_template_path = path.join(xcode_path,
                                     XCODE_REL_PROJECT_TEMPLATE_INFO_PATH)
@@ -273,16 +388,57 @@ def load_xcode_defaults(xcode_path, options_groups):
 
 def xcspec_optgroups_as_xcconfig(options_groups, default_values=None,
                                  add_doc=False):
-    xcconfig = '// Generated using XcodeWarningsAsXcconfig\n'
-    xcconfig += '// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig\n'
-    xcconfig += '\n'
-
+    formatted_optgroups = ''
     for options_group in options_groups:
-        xcconfig += options_group.format_as_xcconfig(
+        formatted_optgroups += options_group.format_for_xcconfig(
             default_values=default_values,
             add_doc=add_doc
         )
-        xcconfig += '\n'
+        formatted_optgroups += '\n'
+
+    return formatted_optgroups
+
+
+def analyzer_flags_as_xcconfig(analyzer_flags, add_doc=False):
+    if not analyzer_flags:
+        return ''
+
+    formatted_flags = '// Clang Analyzer Flags\n'
+
+    if add_doc:
+        for flag in analyzer_flags:
+            formatted_flags += '// {}: {}\n'.format(flag.name, flag.doc)
+
+    formatted_flags += 'WAX_ANALYZER_FLAGS ='
+    for flag in analyzer_flags:
+        formatted_flags += ' '
+        formatted_flags += flag.format_for_xcconfig()
+    formatted_flags += '\n'
+
+    formatted_flags += '\n'
+    formatted_flags += 'WARNING_CFLAGS = $(inherited) $(WAX_ANALYZER_FLAGS)'
+
+    return formatted_flags
+
+
+def generate_xcconfig(optgroups, analyzer_flags, default_values=None,
+                      add_doc=False):
+    header = ('// Generated using XcodeWarningsAsXcconfig\n'
+              '// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig\n'
+              '\n')
+
+    optgroups = xcspec_optgroups_as_xcconfig(
+        optgroups,
+        default_values=default_values,
+        add_doc=add_doc
+    )
+
+    analyzer_flags = analyzer_flags_as_xcconfig(
+        analyzer_flags,
+        add_doc=add_doc
+    )
+
+    xcconfig = header + optgroups + analyzer_flags
 
     return xcconfig
 
@@ -310,6 +466,9 @@ def parse_script_args():
     parser.add_argument(
         '--no-swift', dest='swift', action='store_false',
         help='don\'t include Swift-related flags in the output')
+    parser.add_argument(
+        '--no-analyzer', dest='analyzer_flags', action='store_false',
+        help='don\'t include Clang Analyzer checker flags in the output')
     parser.add_argument(
         '--doc', action='store_true',
         help='include documentation about the options in the generated '
@@ -341,6 +500,15 @@ def xcspec_path(xcode_path, xcplugin, xcspec=None):
     return full_path
 
 
+def default_toolchain_bin_path(xcode_path, bin_name):
+    path_template = ('Contents/Developer/Toolchains/XcodeDefault.xctoolchain/'
+                     'usr/bin/{}')
+    rel_path = path_template.format(bin_name)
+    full_path = path.join(xcode_path, rel_path)
+
+    return full_path
+
+
 def main():
     args = parse_script_args()
 
@@ -350,9 +518,11 @@ def main():
         'com.apple.compilers.llvm.clang.1_0.compiler',
         category_filter=r'^Warning'
     )
-    options_groups += clang_llvm_parser.parse_options(
-        'com.apple.compilers.llvm.clang.1_0.analyzer'
-    )
+
+    if args.analyzer_flags:
+        options_groups += clang_llvm_parser.parse_options(
+            'com.apple.compilers.llvm.clang.1_0.analyzer'
+        )
 
     if args.swift:
         swift_xcspec_path = xcspec_path(
@@ -366,8 +536,16 @@ def main():
 
     load_xcode_defaults(args.xcode_path, options_groups)
 
-    xcconfig = xcspec_optgroups_as_xcconfig(
+    analyzer_flags = None
+    if args.analyzer_flags:
+        all_xspec_options = list(flatmap(lambda g: g.options, options_groups))
+        clang_bin_path = default_toolchain_bin_path(args.xcode_path, 'clang')
+        help_parser = ClangHelpParser(clang_bin_path, all_xspec_options)
+        analyzer_flags = help_parser.parse_help()
+
+    xcconfig = generate_xcconfig(
         options_groups,
+        analyzer_flags,
         default_values=args.defaults,
         add_doc=args.doc
     )

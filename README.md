@@ -84,6 +84,8 @@ This project is largely inpired from other great xcconfig projects and blog post
 - [https://github.com/tewha/MoreWarnings-xcconfig](https://github.com/tewha/MoreWarnings-xcconfig)
 - [http://www.jontolof.com/cocoa/using-xcconfig-files-for-you-xcode-project/](http://www.jontolof.com/cocoa/using-xcconfig-files-for-you-xcode-project/)
 
+Credit to [@steipete](https://twitter.com/steipete) for finding the [Clang Analyzer alpha checkers](https://gist.github.com/steipete/86c4db2cda22aa7427bb453907885c1f).
+
 ## Author
 
 Guillaume Algis ([@guillaumealgis](https://twitter.com/guillaumealgis))
