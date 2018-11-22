@@ -61,6 +61,18 @@ CLANG_STATIC_ANALYZER_MODE = // shallow | deep
 CLANG_STATIC_ANALYZER_MODE_ON_ANALYZE_ACTION = // shallow | deep
 ```
 
+### Clang Static Analyzer
+
+If you decide to include Clang Static Analyzer flags in your xcconfig (which is the default), remember to enable the Static Analyzer in your project.
+
+It can be done with the following flags (either in your xcconfig or Xcode project): 
+
+```bash
+RUN_CLANG_STATIC_ANALYZER // YES | NO
+CLANG_STATIC_ANALYZER_MODE // deep | shallow
+CLANG_STATIC_ANALYZER_MODE_ON_ANALYZE_ACTION // deep | shallow
+```
+
 ### Custom Xcode install
 
 By default, the script will use `xcode-select -p` to find your Xcode installation path. If you want to extract warnings from another Xcode install (say, a Beta), use the `--xcode-path` flag:
