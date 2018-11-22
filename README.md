@@ -1,5 +1,8 @@
 # Xcode Warnings to .xcconfig
 
+[![MIT](https://img.shields.io/github/license/guillaumealgis/XcodeWarningsAsXcconfig.svg)](https://tldrlegal.com/license/mit-license)
+[![Build Status](https://img.shields.io/travis/guillaumealgis/XcodeWarningsAsXcconfig/master.svg)](https://travis-ci.org/guillaumealgis/XcodeWarningsAsXcconfig)
+
 warnings2xcconfig is a tool to extract compiler and static analyzer warning flags from Xcode and format them into [a xcconfig file you can use in your projects](http://www.jontolof.com/cocoa/using-xcconfig-files-for-you-xcode-project/).
 
 It provides sensible defaults for each flag so you can get as much help from the compiler as possible.
