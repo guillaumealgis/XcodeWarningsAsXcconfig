@@ -119,7 +119,9 @@ class XcspecOptionsGroup(object):
     def format_for_xcconfig(self, default_values=None, add_doc=False):
         xcconfig_string = '// {}\n'.format(self.display_name)
 
-        for option in self.options:
+        sorted_options = sorted(self.options, key=lambda o: o.name)
+
+        for option in sorted_options:
             xcconfig_string += option.format_for_xcconfig(
                 default_values=default_values,
                 add_doc=add_doc
@@ -449,8 +451,13 @@ def load_xcode_defaults(xcode_path, options_groups):
 
 def xcspec_optgroups_as_xcconfig(options_groups, default_values=None,
                                  add_doc=False):
+    sorted_options_groups = sorted(
+        options_groups,
+        key=lambda g: g.display_name
+    )
+
     formatted_optgroups = ''
-    for options_group in options_groups:
+    for options_group in sorted_options_groups:
         formatted_optgroups += options_group.format_for_xcconfig(
             default_values=default_values,
             add_doc=add_doc
