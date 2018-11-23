@@ -13,32 +13,42 @@ You can find pre-generated xcconfig files for your version of Xcode in the `Xcod
 
 ## Usage
 
-To produce a xcconfig file with strict, hand-picked defaults, use:
+To produce a xcconfig file with strict, hand-picked defaults, run:
 
 ```bash
 python warnings2xcconfig.py --defaults strict > Warnings.xcconfig
 ```
 
+This will produce a xcconfig file with **strict, but pragmatic, handpicked default values** for each build setting.
+
 
 ### Other `--defaults` options
 
-Use LLVM-Clang's default values:
+Use **Clang**'s default values:
 
 ```bash
 python warnings2xcconfig.py --defaults clang
 ```
 
-Use default values Xcode picks when creating a new project:
+--------------------------
+
+Use **Xcode**'s default values (the one you get when creating a new project):
 
 ```bash
 python warnings2xcconfig.py --defaults xcode
 ```
 
-Enable all warnings, using the most aggressive option available for each flag:
+--------------------------
+
+**Enable all warnings**, using the most aggressive option available for each flag:
 
 ```bash
 python warnings2xcconfig.py --defaults aggressive
 ```
+
+--------------------------
+
+**No defaults**
 
 If you pass `none`, or do not include the `--defaults` flag at all, the xcconfig file will be generated without default values, but with comments listing the valid values for each flag.
 
@@ -55,11 +65,13 @@ CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = // YES | NO
 
 ... snip ...
 
-// Static Analyzer - Analysis Policiy
+// Static Analyzer - Analysis Policy
 RUN_CLANG_STATIC_ANALYZER = // YES | NO
 CLANG_STATIC_ANALYZER_MODE = // shallow | deep
 CLANG_STATIC_ANALYZER_MODE_ON_ANALYZE_ACTION = // shallow | deep
 ```
+
+You can then pick which setting you want to enable or not for your specific needs.
 
 ### Clang Static Analyzer
 
