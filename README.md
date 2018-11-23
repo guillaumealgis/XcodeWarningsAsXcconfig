@@ -81,6 +81,15 @@ By default, the script will use `xcode-select -p` to find your Xcode installatio
 python warnings2xcconfig.py --xcode-path /Applications/Xcode-Beta.app/
 ```
 
+## Diff
+
+To find out what changed between two version of Xcode, you can use the following command (in bash):
+
+```bash
+diff <(grep -E "^[^/ ]" Xcode-7.3/Warnings-XcodeDefaults.xcconfig | sort) <(grep -E "^[^/ ]" Xcode-10.0/Warnings-XcodeDefaults.xcconfig | sort)
+```
+
+*(replace the xcconfig files to compare in the command)*
 
 ## Contributing
 
