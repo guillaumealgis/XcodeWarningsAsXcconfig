@@ -89,10 +89,14 @@ class XcspecOptionsGroup(object):
             'WarningsObjC': 'Warnings - Objective C',
             'Warnings': 'Warnings - All languages',
 
+            'LanguageModules': 'Language - Modules',
+
             'SAObjCCheckers': 'Issues - Objective C',
             'SASecurityCheckers': 'Issues - Security',
+            'SAAppleAPICheckers': 'Issues - Apple APIs',
             'SACheckers': 'Generic Issues',
-            'SAPolicy': 'Analysis Policiy',
+            'SAPolicy': 'Analysis Policy',
+            'UBSANPolicy': 'Undefined Behavior Sanitizer',
         }
 
         name = self.tool_name + ' - '
