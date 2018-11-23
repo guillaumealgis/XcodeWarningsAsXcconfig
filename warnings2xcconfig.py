@@ -298,12 +298,14 @@ class XSpecParser(object):
         for option in xcspec_options:
             xcspec_option = XcspecOption(option)
 
+            if not self.is_option_valid(xcspec_option):
+                continue
+
             match = self.option_matches_filters(
                 xcspec_option,
                 category_filter,
                 cli_args_filter,
             )
-
             if not match:
                 continue
 
@@ -316,23 +318,29 @@ class XSpecParser(object):
 
         return options_groups.values()
 
-    def option_matches_filters(self, xcspec_option, category_filter=None,
-                               cli_args_filter=None):
+    def is_option_valid(self, xcspec_option):
         if xcspec_option.name in INGORED_BUILD_SETTINGS:
+            return False
+
+        if xcspec_option.name.endswith('EXPERIMENTAL'):
             return False
 
         if xcspec_option.type in ['Path', 'String']:
             return False
 
+        # Never include options depending on an user defined value
+        if any(['$(value)' in arg for arg in xcspec_option.command_line_args]):
+            return False
+
+        return True
+
+    def option_matches_filters(self, xcspec_option, category_filter=None,
+                               cli_args_filter=None):
         category = xcspec_option.category
         if category_filter and category_filter.search(category):
             return True
 
         for arg in xcspec_option.command_line_args:
-            # Never include options depending on a user defined value
-            if '$(value)' in arg:
-                return False
-
             if cli_args_filter and cli_args_filter.search(arg):
                 return True
 
