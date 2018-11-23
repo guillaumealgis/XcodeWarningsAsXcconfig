@@ -525,6 +525,10 @@ def main():
 
     if args.analyzer_flags:
         options_groups += clang_llvm_parser.parse_options(
+            'com.apple.compilers.llvm.clang.1_0.compiler',
+            category_filter=r'UBSANPolicy'
+        )
+        options_groups += clang_llvm_parser.parse_options(
             'com.apple.compilers.llvm.clang.1_0.analyzer'
         )
 
