@@ -40,6 +40,10 @@ STRICT_DEFAULTS_EXCEPTIONS = {
     # Probably a bit controversial, but not uncommon to ignore some parameters
     # in Apple delegates methods
     'GCC_WARN_UNUSED_PARAMETER': 'NO',
+
+    # It's not unusual to have a @selector on its own, apart from a method
+    # definition
+    'GCC_WARN_MULTIPLE_DEFINITION_TYPES_FOR_SELECTOR': 'NO',
 }
 
 ###############################################################################
@@ -48,7 +52,14 @@ STRICT_DEFAULTS_EXCEPTIONS = {
 AGGRESSIVE_DEFAULTS_EXCEPTIONS = {
     'GCC_WARN_INHIBIT_ALL_WARNINGS': 'NO',
     'SWIFT_SUPPRESS_WARNINGS': 'NO',
+    'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES': 'NO',
+    'GCC_ENABLE_TRIGRAPHS': 'NO',
 }
+
+# Those are build settings we found in Xcode files but should stay untouched
+INGORED_BUILD_SETTINGS = [
+    'CLANG_INDEX_STORE_ENABLE',
+]
 
 # Clang Analyzer flags which are either too noisy, returns too much
 # false-positives, or are already included in Xcode build settings
@@ -128,11 +139,12 @@ class XcspecOption(object):
     def from_xspec_dict(self, xcspec_dict):
         self.name = xcspec_dict['Name']
         self.display_name = xcspec_dict.get('DisplayName')
+        self.category = xcspec_dict.get('Category', 'Others')
         self.description = xcspec_dict.get('Description')
         self.type = xcspec_dict['Type']
         self.values = xcspec_dict.get('Values')
         self.clang_default_value = xcspec_dict.get('DefaultValue')
-        self.command_line_args = xcspec_dict.get('CommandLineArgs')
+        self.raw_command_line_args = xcspec_dict.get('CommandLineArgs')
 
     @property
     def aggressive_default_value(self):
@@ -202,13 +214,23 @@ class XcspecOption(object):
         return value
 
     @property
-    def clang_analyzer_flags(self):
-        if not self.command_line_args:
+    def command_line_args(self):
+        if not self.raw_command_line_args:
             return []
 
-        args = flatten(self.command_line_args.values())
-        flags = [arg for arg in args if not arg.startswith('-')]
+        if isinstance(self.raw_command_line_args, list):
+            return self.raw_command_line_args
 
+        args = flatten(self.raw_command_line_args.values())
+
+        return args
+
+    @property
+    def clang_analyzer_flags(self):
+        args = self.command_line_args
+        if '-Xclang' not in args or '-analyzer-checker' not in args:
+            return []
+        flags = [arg for arg in args if not arg.startswith('-')]
         return flags
 
     def format_for_xcconfig(self, default_values=None, add_doc=False):
@@ -262,32 +284,61 @@ class XSpecParser(object):
 
         return xcspec_tool
 
-    def parse_options(self, tool_identifier, category_filter=None):
+    def parse_options(self, tool_identifier, category_filter=None,
+                      cli_args_filter=None):
         if category_filter:
             category_filter = re.compile(category_filter)
+
+        if cli_args_filter:
+            cli_args_filter = re.compile(cli_args_filter)
 
         xcspec_tool = self._get_tool_with_id(tool_identifier)
         xcspec_tool_name = xcspec_tool['Name']
         xcspec_options = xcspec_tool['Options']
 
         options_groups = {}
-        for xcspec_option in xcspec_options:
-            if 'Category' not in xcspec_option:
+        for option in xcspec_options:
+            xcspec_option = XcspecOption(option)
+
+            match = self.option_matches_filters(
+                xcspec_option,
+                category_filter,
+                cli_args_filter,
+            )
+
+            if not match:
                 continue
 
-            category = xcspec_option['Category']
-
-            if category_filter and not category_filter.search(category):
-                continue
-
+            category = xcspec_option.category
             if category not in options_groups:
-                options_groups[category] = XcspecOptionsGroup(xcspec_tool_name,
-                                                              category)
+                new_group = XcspecOptionsGroup(xcspec_tool_name, category)
+                options_groups[category] = new_group
 
-            option = XcspecOption(xcspec_option)
-            options_groups[category].options.append(option)
+            options_groups[category].options.append(xcspec_option)
 
         return options_groups.values()
+
+    def option_matches_filters(self, xcspec_option, category_filter=None,
+                               cli_args_filter=None):
+        if xcspec_option.name in INGORED_BUILD_SETTINGS:
+            return False
+
+        if xcspec_option.type in ['Path', 'String']:
+            return False
+
+        category = xcspec_option.category
+        if category_filter and category_filter.search(category):
+            return True
+
+        for arg in xcspec_option.command_line_args:
+            # Never include options depending on a user defined value
+            if '$(value)' in arg:
+                return False
+
+            if cli_args_filter and cli_args_filter.search(arg):
+                return True
+
+        return category_filter is None and cli_args_filter is None
 
 
 class ClangAnalyzerFlag(object):
@@ -520,7 +571,8 @@ def main():
     clang_llvm_parser = XSpecParser(clang_llvm_xcspec_path)
     options_groups = clang_llvm_parser.parse_options(
         'com.apple.compilers.llvm.clang.1_0.compiler',
-        category_filter=r'^Warning'
+        category_filter=r'^Warning',
+        cli_args_filter=r'^-W'
     )
 
     if args.analyzer_flags:
