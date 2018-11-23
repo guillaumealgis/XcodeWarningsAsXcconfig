@@ -26,21 +26,16 @@ from subprocess import check_output, check_call
 STRICT_DEFAULTS_EXCEPTIONS = {
     # https://openradar.appspot.com/radar?id=5907704967069696
     'CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK': 'NO',
-
     # It's sometime useful to test a few things in debug build
     # Maybe use `YES` for release builds
     'GCC_TREAT_WARNINGS_AS_ERRORS': 'NO',
-
     # Doesn't play nice with Apple Frameworks
     'GCC_WARN_PEDANTIC': 'NO',
-
     # Don't need that with Objective-C 2.0
     'CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS': 'NO',
-
     # Probably a bit controversial, but not uncommon to ignore some parameters
     # in Apple delegates methods
     'GCC_WARN_UNUSED_PARAMETER': 'NO',
-
     # It's not unusual to have a @selector on its own, apart from a method
     # definition
     'GCC_WARN_MULTIPLE_DEFINITION_TYPES_FOR_SELECTOR': 'NO',
@@ -54,6 +49,9 @@ AGGRESSIVE_DEFAULTS_EXCEPTIONS = {
     'SWIFT_SUPPRESS_WARNINGS': 'NO',
     'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES': 'NO',
     'GCC_ENABLE_TRIGRAPHS': 'NO',
+    # The default when Analyzing will stay "deep", but when Building we prefer
+    # to favor build speed over thoroughness
+    'CLANG_STATIC_ANALYZER_MODE': 'shallow',
 }
 
 # Those are build settings we found in Xcode files but should stay untouched
