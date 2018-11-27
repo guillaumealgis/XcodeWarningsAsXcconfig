@@ -459,8 +459,7 @@ def load_xcode_defaults(xcode_path, options_groups):
             option.xcode_default_value = xcode_defaults[option.name]
 
 
-def xcspec_optgroups_as_xcconfig(options_groups, default_values=None,
-                                 add_doc=False):
+def xcspec_optgroups_as_xcconfig(options_groups, default_values, add_doc):
     sorted_options_groups = sorted(
         options_groups,
         key=lambda g: g.display_name
@@ -477,7 +476,7 @@ def xcspec_optgroups_as_xcconfig(options_groups, default_values=None,
     return formatted_optgroups
 
 
-def analyzer_flags_as_xcconfig(analyzer_flags, add_doc=False):
+def analyzer_flags_as_xcconfig(analyzer_flags, add_doc, prefix):
     if not analyzer_flags:
         return ''
 
@@ -487,7 +486,7 @@ def analyzer_flags_as_xcconfig(analyzer_flags, add_doc=False):
         for flag in analyzer_flags:
             formatted_flags += '// {}: {}\n'.format(flag.name, flag.doc)
 
-    formatted_flags += 'WAX_ANALYZER_FLAGS ='
+    formatted_flags += prefix + '_ANALYZER_FLAGS ='
     for flag in analyzer_flags:
         formatted_flags += ' '
         formatted_flags += flag.format_for_xcconfig()
@@ -499,8 +498,8 @@ def analyzer_flags_as_xcconfig(analyzer_flags, add_doc=False):
     return formatted_flags
 
 
-def generate_xcconfig(optgroups, analyzer_flags, default_values=None,
-                      add_doc=False):
+def generate_xcconfig(optgroups, analyzer_flags, default_values, add_doc,
+                      prefix):
     header = ('// Generated using XcodeWarningsAsXcconfig\n'
               '// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig\n'
               '\n')
@@ -513,7 +512,8 @@ def generate_xcconfig(optgroups, analyzer_flags, default_values=None,
 
     analyzer_flags = analyzer_flags_as_xcconfig(
         analyzer_flags,
-        add_doc=add_doc
+        add_doc=add_doc,
+        prefix=prefix
     )
 
     xcconfig = header + optgroups + analyzer_flags
@@ -550,6 +550,10 @@ def parse_script_args():
     parser.add_argument(
         '--no-localizability', dest='localizability', action='store_false',
         help='don\'t include localization-related flags in the output')
+    parser.add_argument(
+        '-p', '--prefix', dest='prefix', action='store', type=str,
+        default='WAX', help='the prefix to use for variables in the output '
+        '(default is "WAX")')
     parser.add_argument(
         '--doc', action='store_true',
         help='include documentation about the options in the generated '
@@ -636,7 +640,8 @@ def main():
         options_groups,
         analyzer_flags,
         default_values=args.defaults,
-        add_doc=args.doc
+        add_doc=args.doc,
+        prefix=args.prefix
     )
     print(xcconfig)
 
