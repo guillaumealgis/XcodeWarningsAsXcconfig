@@ -251,6 +251,7 @@ class XcspecOption(object):
 class XSpecParser(object):
     def __init__(self, filepath):
         self._open_xcspec(filepath)
+        self.include_localization_options = False
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._xcspec_file.close()
@@ -334,6 +335,10 @@ class XSpecParser(object):
         if any(['$(value)' in arg for arg in xcspec_option.command_line_args]):
             return False
 
+        is_localization_option = 'LOCALIZABILITY' in xcspec_option.name.upper()
+        if not self.include_localization_options and is_localization_option:
+            return False
+
         return True
 
     def option_matches_filters(self, xcspec_option, category_filter=None,
@@ -362,6 +367,7 @@ class ClangAnalyzerFlag(object):
 class ClangHelpParser(object):
     def __init__(self, clang_bin_path, all_xspec_options=None):
         self.clang_bin_path = clang_bin_path
+        self.include_localization_flags = True
 
         # Extract the command line flags from all build settings we already
         # have so we don't repeat the same options twice when building
@@ -430,6 +436,10 @@ class ClangHelpParser(object):
             return False
 
         if flag.name in self.skipped_flags:
+            return False
+
+        is_localization_flag = 'LOCALIZABILITY' in flag.name.upper()
+        if not self.include_localization_flags and is_localization_flag:
             return False
 
         return True
@@ -538,6 +548,9 @@ def parse_script_args():
         '--no-analyzer', dest='analyzer_flags', action='store_false',
         help='don\'t include Clang Analyzer checker flags in the output')
     parser.add_argument(
+        '--no-localizability', dest='localizability', action='store_false',
+        help='don\'t include localization-related flags in the output')
+    parser.add_argument(
         '--doc', action='store_true',
         help='include documentation about the options in the generated '
              'xcconfig file, if available')
@@ -582,6 +595,7 @@ def main():
 
     clang_llvm_xcspec_path = xcspec_path(args.xcode_path, 'Clang LLVM 1.0')
     clang_llvm_parser = XSpecParser(clang_llvm_xcspec_path)
+    clang_llvm_parser.include_localization_options = args.localizability
     options_groups = clang_llvm_parser.parse_options(
         'com.apple.compilers.llvm.clang.1_0.compiler',
         category_filter=r'^Warning',
@@ -602,6 +616,7 @@ def main():
             args.xcode_path, 'XCLanguageSupport', 'Swift'
         )
         swift_parser = XSpecParser(swift_xcspec_path)
+        swift_parser.include_localization_options = args.localizability
         options_groups += swift_parser.parse_options(
             'com.apple.xcode.tools.swift.compiler',
             category_filter=r'^Warning'
@@ -614,6 +629,7 @@ def main():
         all_xspec_options = list(flatmap(lambda g: g.options, options_groups))
         clang_bin_path = default_toolchain_bin_path(args.xcode_path, 'clang')
         help_parser = ClangHelpParser(clang_bin_path, all_xspec_options)
+        help_parser.include_localization_flags = args.localizability
         analyzer_flags = help_parser.parse_help()
 
     xcconfig = generate_xcconfig(
