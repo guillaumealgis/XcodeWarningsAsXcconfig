@@ -359,9 +359,18 @@ class ClangAnalyzerFlag(object):
         self.name = name
         self.doc = doc
 
-    def format_for_xcconfig(self):
+    def format_for_xcconfig(self, varname, add_doc, use_new_syntax):
         flag_str = '-Xclang -analyzer-checker -Xclang {}'.format(self.name)
-        return flag_str
+
+        if not use_new_syntax:
+            return flag_str
+
+        out = ''
+        if add_doc:
+            out += '// %s\n' % self.doc
+        out += '%s = $(inherited) %s' % (varname, flag_str)
+
+        return out
 
 
 class ClangHelpParser(object):
@@ -476,30 +485,40 @@ def xcspec_optgroups_as_xcconfig(options_groups, default_values, add_doc):
     return formatted_optgroups
 
 
-def analyzer_flags_as_xcconfig(analyzer_flags, add_doc, prefix):
+def analyzer_flags_as_xcconfig(analyzer_flags, add_doc, prefix,
+                               use_new_syntax):
     if not analyzer_flags:
         return ''
 
-    formatted_flags = '// Clang Analyzer Flags\n'
+    out = '// Clang Analyzer Flags\n'
 
-    if add_doc:
-        for flag in analyzer_flags:
-            formatted_flags += '// {}: {}\n'.format(flag.name, flag.doc)
+    varname = prefix + '_ANALYZER_FLAGS'
 
-    formatted_flags += prefix + '_ANALYZER_FLAGS ='
-    for flag in analyzer_flags:
-        formatted_flags += ' '
-        formatted_flags += flag.format_for_xcconfig()
-    formatted_flags += '\n'
+    formatted_flags = [
+        f.format_for_xcconfig(varname, add_doc, use_new_syntax)
+        for f in analyzer_flags
+    ]
 
-    formatted_flags += '\n'
-    formatted_flags += 'WARNING_CFLAGS = $(inherited) $(WAX_ANALYZER_FLAGS)'
+    if use_new_syntax:
+        out += '\n'.join(formatted_flags)
+    else:
+        # Flags are all printed on the same line, so output the documentation
+        # in one bloc before the flags.
+        if add_doc:
+            for flag in analyzer_flags:
+                out += '// {}: {}\n'.format(flag.name, flag.doc)
 
-    return formatted_flags
+        out += varname + ' = '
+        out += ' '.join(formatted_flags)
+
+    out += '\n\n'
+    out += 'WARNING_CFLAGS = $(inherited) $(WAX_ANALYZER_FLAGS)'
+
+    return out
 
 
 def generate_xcconfig(optgroups, analyzer_flags, default_values, add_doc,
-                      prefix):
+                      prefix, use_new_syntax):
     header = ('// Generated using XcodeWarningsAsXcconfig\n'
               '// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig\n'
               '\n')
@@ -513,7 +532,8 @@ def generate_xcconfig(optgroups, analyzer_flags, default_values, add_doc,
     analyzer_flags = analyzer_flags_as_xcconfig(
         analyzer_flags,
         add_doc=add_doc,
-        prefix=prefix
+        prefix=prefix,
+        use_new_syntax=use_new_syntax
     )
 
     xcconfig = header + optgroups + analyzer_flags
@@ -558,6 +578,10 @@ def parse_script_args():
         '--doc', action='store_true',
         help='include documentation about the options in the generated '
              'xcconfig file, if available')
+    parser.add_argument(
+        '--new-syntax', dest='new_syntax', action='store_true',
+        help='use the new xcconfig syntax introduced with the new build'
+             'system of Xcode 10')
 
     args = parser.parse_args()
 
@@ -641,7 +665,8 @@ def main():
         analyzer_flags,
         default_values=args.defaults,
         add_doc=args.doc,
-        prefix=args.prefix
+        prefix=args.prefix,
+        use_new_syntax=args.new_syntax
     )
     print(xcconfig)
 
