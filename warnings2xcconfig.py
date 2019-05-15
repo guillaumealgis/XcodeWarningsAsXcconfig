@@ -29,6 +29,7 @@ STRICT_DEFAULTS_EXCEPTIONS = {
     # It's sometime useful to test a few things in debug build
     # Maybe use `YES` for release builds
     'GCC_TREAT_WARNINGS_AS_ERRORS': 'NO',
+    'SWIFT_TREAT_WARNINGS_AS_ERRORS': 'NO',
     # Doesn't play nice with Apple Frameworks
     'GCC_WARN_PEDANTIC': 'NO',
     # Don't need that with Objective-C 2.0
