@@ -9,7 +9,7 @@ It provides sensible defaults for each flag so you can get as much help from the
 
 ## Ready-to-use xcconfig files
 
-You can find pre-generated xcconfig files for your version of Xcode in the `Xcode-*` folders. Each folder contains a few xcconfig files with differents default settings (one per `--defaults` option, see "Usage" for what each option means).
+You can find pre-generated xcconfig files for your version of Xcode in the `Xcode-*` folders. Each folder contains a few xcconfig files with differents default settings (one per `--defaults` option, see below for what each option means).
 
 ## Usage
 
@@ -22,33 +22,43 @@ python warnings2xcconfig.py --defaults strict > Warnings.xcconfig
 This will produce a xcconfig file with **strict, but pragmatic, handpicked default values** for each build setting.
 
 
-### Other `--defaults` options
+### Available styles
 
-Use **Clang**'s default values:
+The possible values you can pass to the `--defaults` flag are:
+
+#### Strict
+
+Use strict, hand-picked default values. Those are similar to "agressive", but with some warnings turned off to keep day-to-day development sane:
+
+```bash
+python warnings2xcconfig.py --defaults strict
+```
+
+#### Clang
+
+Use Clang's default values:
 
 ```bash
 python warnings2xcconfig.py --defaults clang
 ```
 
---------------------------
+#### Xcode
 
-Use **Xcode**'s default values (the one you get when creating a new project):
+Use Xcode's default values (the ones you get when creating a new project):
 
 ```bash
 python warnings2xcconfig.py --defaults xcode
 ```
 
---------------------------
+#### Aggressive
 
-**Enable all warnings**, using the most aggressive option available for each flag:
+Enable all warnings, using the most aggressive option available for each flag:
 
 ```bash
 python warnings2xcconfig.py --defaults aggressive
 ```
 
---------------------------
-
-**No defaults**
+#### None
 
 If you pass `none`, or do not include the `--defaults` flag at all, the xcconfig file will be generated without default values, but with comments listing the valid values for each flag.
 
@@ -71,7 +81,7 @@ CLANG_STATIC_ANALYZER_MODE = // shallow | deep
 CLANG_STATIC_ANALYZER_MODE_ON_ANALYZE_ACTION = // shallow | deep
 ```
 
-You can then pick which setting you want to enable or not for your specific needs.
+You can then pick the settings you want to enable or not for your specific needs.
 
 ### Clang Static Analyzer
 
