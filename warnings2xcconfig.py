@@ -66,6 +66,9 @@ IGNORED_CLANG_ANALYZER_FLAGS = [
     # Too much false positives
     'alpha.clone.CloneChecker',
     'alpha.deadcode.UnreachableCode',
+    # Crashes clang
+    # rdar://51330803 http://www.openradar.me/radar?id=5579839566249984
+    'alpha.cplusplus.EnumCastOutOfRange',
 ]
 
 XCODE_REL_PROJECT_TEMPLATE_INFO_PATH = ('Contents/Developer/Library/Xcode/'
