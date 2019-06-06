@@ -513,7 +513,7 @@ def analyzer_flags_as_xcconfig(analyzer_flags, add_doc, prefix,
         out += ' '.join(formatted_flags)
 
     out += '\n\n'
-    out += 'WARNING_CFLAGS = $(inherited) $(WAX_ANALYZER_FLAGS)'
+    out += 'WARNING_CFLAGS = $(inherited) $(' + prefix + '_ANALYZER_FLAGS)'
 
     return out
 
