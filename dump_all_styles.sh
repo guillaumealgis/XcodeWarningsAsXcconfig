@@ -18,7 +18,7 @@ function export_settings_with_defaults {
     OPTION=$1
     NAME="$(tr '[:lower:]' '[:upper:]' <<< "${OPTION:0:1}")${OPTION:1}"
     echo "Exporting settings for $NAME"
-    ./warnings2xcconfig.py --defaults "$OPTION" > "$XCODE_FOLDER/Warnings-${NAME}Defaults.xcconfig" || {
+    ./warnings2xcconfig.py --new-syntax --defaults "$OPTION" > "$XCODE_FOLDER/Warnings-${NAME}Defaults.xcconfig" || {
         rm -r "$XCODE_FOLDER"
         exit 1
     }
