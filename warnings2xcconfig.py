@@ -1,13 +1,10 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
-
-from __future__ import (unicode_literals, absolute_import, division,
-                        print_function)
+#! /usr/bin/env python3
 
 import argparse
 import itertools
-import plistlib
+import plistlib as plist
 import re
+import sys
 import tempfile
 from os import path
 
@@ -76,6 +73,8 @@ XCODE_REL_PROJECT_TEMPLATE_INFO_PATH = ('Contents/Developer/Library/Xcode/'
                                         'Base_ProjectSettings.xctemplate/'
                                         'TemplateInfo.plist')
 
+STDOUT_ENCODING = sys.stdout.encoding
+
 
 # Grabbed from https://stackoverflow.com/a/20037408/404321
 def flatmap(func, *iterable):
@@ -87,7 +86,7 @@ def flatten(list_of_lists):
     return list(itertools.chain.from_iterable(list_of_lists))
 
 
-class XcspecOptionsGroup(object):
+class XcspecOptionsGroup:
     def __init__(self, tool_name, group_name):
         self.tool_name = tool_name
         self.group_name = group_name
@@ -134,7 +133,7 @@ class XcspecOptionsGroup(object):
         return xcconfig_string
 
 
-class XcspecOption(object):
+class XcspecOption:
     def __init__(self, xcspec_dict):
         self.from_xspec_dict(xcspec_dict)
         self.xcode_default_value = None
@@ -176,13 +175,13 @@ class XcspecOption(object):
     def aggressive_default_enum_value(values):
         if values == ['YES', 'NO']:
             return 'YES'
-        elif 'YES_AGGRESSIVE' in values:
+        if 'YES_AGGRESSIVE' in values:
             return 'YES_AGGRESSIVE'
-        elif 'YES_ERROR' in values:
+        if 'YES_ERROR' in values:
             return 'YES_ERROR'
-        elif set(values) == set(['YES', 'YES_NONAGGRESSIVE', 'NO']):
+        if set(values) == {'YES', 'YES_NONAGGRESSIVE', 'NO'}:
             return 'YES'
-        elif set(values) == set(['shallow', 'deep']):
+        if set(values) == {'shallow', 'deep'}:
             return 'deep'
 
         return None
@@ -252,7 +251,7 @@ class XcspecOption(object):
         return opt_str
 
 
-class XSpecParser(object):
+class XSpecParser:
     def __init__(self, filepath):
         self._open_xcspec(filepath)
         self.include_localization_options = False
@@ -268,7 +267,7 @@ class XSpecParser(object):
         check_call(['plutil', '-convert', 'xml1', file_path,
                     '-o', self._xcspec_file.name])
 
-        self.xcspec_root = plistlib.readPlist(self._xcspec_file)
+        self.xcspec_root = plist.load(self._xcspec_file)
 
     def _get_tool_with_id(self, tool_identifier):
         xcspec_tool = None
@@ -323,7 +322,7 @@ class XSpecParser(object):
 
             options_groups[category].options.append(xcspec_option)
 
-        return options_groups.values()
+        return list(options_groups.values())
 
     def is_option_valid(self, xcspec_option):
         if xcspec_option.name in INGORED_BUILD_SETTINGS:
@@ -358,7 +357,7 @@ class XSpecParser(object):
         return category_filter is None and cli_args_filter is None
 
 
-class ClangAnalyzerFlag(object):
+class ClangAnalyzerFlag:
     def __init__(self, name, doc=None):
         self.name = name
         self.doc = doc
@@ -377,7 +376,7 @@ class ClangAnalyzerFlag(object):
         return out
 
 
-class ClangHelpParser(object):
+class ClangHelpParser:
     def __init__(self, clang_bin_path, all_xspec_options=None):
         self.clang_bin_path = clang_bin_path
         self.include_localization_flags = True
@@ -400,6 +399,7 @@ class ClangHelpParser(object):
         clang_help = check_output([
             self.clang_bin_path, '-cc1', '-analyzer-checker-help'
         ])
+        clang_help = clang_help.decode(STDOUT_ENCODING)
 
         for line in clang_help.splitlines():
             self.parse_line(line)
@@ -461,7 +461,8 @@ class ClangHelpParser(object):
 def load_xcode_defaults(xcode_path, options_groups):
     xcode_template_path = path.join(xcode_path,
                                     XCODE_REL_PROJECT_TEMPLATE_INFO_PATH)
-    xcode_template_info = plistlib.readPlist(xcode_template_path)
+    with open(xcode_template_path, 'rb') as template_fp:
+        xcode_template_info = plist.load(template_fp, fmt=plist.FMT_XML)
     xcode_defaults = xcode_template_info['Project']['SharedSettings']
 
     for options_group in options_groups:
@@ -592,8 +593,8 @@ def parse_script_args():
     # Default value for xcode-path if none is explicitly specified
     if args.xcode_path is None:
         xcode_path = check_output(['xcode-select', '-p'])
+        xcode_path = xcode_path.decode(STDOUT_ENCODING)
         xcode_path = xcode_path.strip()
-        # import ipdb; ipdb.set_trace(context=5)
         xcode_path = xcode_path.replace('/Contents/Developer', '')
         args.xcode_path = xcode_path
 
