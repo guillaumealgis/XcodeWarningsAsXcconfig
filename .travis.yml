@@ -7,5 +7,6 @@ install:
   - pip install -r requirements_test.txt
 
 script:
-  - flake8
   - black --check *.py
+  - flake8
+  - pylint *.py

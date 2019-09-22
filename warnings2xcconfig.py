@@ -73,7 +73,7 @@ XCODE_REL_PROJECT_TEMPLATE_INFO_PATH = (
     "TemplateInfo.plist"
 )
 
-STDOUT_ENCODING = sys.stdout.encoding
+STDOUT_ENCODING = sys.stdout.encoding  # pylint: disable=invalid-name
 
 
 # Grabbed from https://stackoverflow.com/a/20037408/404321
@@ -131,6 +131,8 @@ class XcspecOptionsGroup:
 
 
 class XcspecOption:
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, xcspec_dict):
         self.from_xspec_dict(xcspec_dict)
         self.xcode_default_value = None
@@ -308,7 +310,7 @@ class XSpecParser:
             if not self.is_option_valid(xcspec_option):
                 continue
 
-            match = self.option_matches_filters(
+            match = XSpecParser.option_matches_filters(
                 xcspec_option, category_filter, cli_args_filter
             )
             if not match:
@@ -343,8 +345,9 @@ class XSpecParser:
 
         return True
 
+    @staticmethod
     def option_matches_filters(
-        self, xcspec_option, category_filter=None, cli_args_filter=None
+        xcspec_option, category_filter=None, cli_args_filter=None
     ):
         category = xcspec_option.category
         if category_filter and category_filter.search(category):
@@ -460,6 +463,8 @@ class ClangHelpParser:
 def load_xcode_defaults(xcode_path, options_groups):
     xcode_template_path = path.join(xcode_path, XCODE_REL_PROJECT_TEMPLATE_INFO_PATH)
     with open(xcode_template_path, "rb") as template_fp:
+        # pylint: disable=no-member
+        # This is a pylint false positive.
         xcode_template_info = plist.load(template_fp, fmt=plist.FMT_XML)
     xcode_defaults = xcode_template_info["Project"]["SharedSettings"]
 
@@ -517,6 +522,10 @@ def analyzer_flags_as_xcconfig(analyzer_flags, add_doc, prefix, use_new_syntax):
 def generate_xcconfig(
     optgroups, analyzer_flags, default_values, add_doc, prefix, use_new_syntax
 ):
+    # pylint: disable=too-many-arguments
+    # This function does a lot, and it might be better to break it down a bit.
+    # For now accept that it needs all these inputs and silence the warning.
+
     header = (
         "// Generated using XcodeWarningsAsXcconfig\n"
         "// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig\n"

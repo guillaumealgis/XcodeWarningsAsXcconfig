@@ -1,0 +1,7 @@
+[MESSAGES CONTROL]
+disable=bad-continuation,
+        missing-docstring,
+        too-few-public-methods
+
+[REPORTS]
+score=no
