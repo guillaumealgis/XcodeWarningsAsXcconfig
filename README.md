@@ -11,15 +11,21 @@ It provides sensible defaults for each flag so you can get as much help from the
 
 You can find pre-generated xcconfig files for your version of Xcode in the `Xcode-*` folders. Each folder contains a few xcconfig files with differents default settings (one per `--defaults` option, see below for what each option means).
 
-## Usage
+## Generating custom xcconfig files (or "how do I use this script?")
 
 To produce a xcconfig file with strict, hand-picked defaults, run:
 
 ```bash
-python warnings2xcconfig.py --defaults strict > Warnings.xcconfig
+python3 warnings2xcconfig.py --defaults strict > Warnings.xcconfig
 ```
 
 This will produce a xcconfig file with **strict, but pragmatic, handpicked default values** for each build setting.
+
+You may need to install python 3 to run the script. Python 3 is available using [brew](https://brew.sh/):
+
+```bash
+brew install python3
+```
 
 
 ### Available styles
@@ -108,7 +114,7 @@ python warnings2xcconfig.py --xcode-path /Applications/Xcode-Beta.app/
 To find out what changed between two version of Xcode, you can use the following command (in bash):
 
 ```bash
-diff <(grep -E "^[^/ ]" Xcode-7.3/Warnings-XcodeDefaults.xcconfig | sort) <(grep -E "^[^/ ]" Xcode-10.0/Warnings-XcodeDefaults.xcconfig | sort)
+diff <(grep -E "^[^/ ]" Xcode-10.3/Warnings-XcodeDefaults.xcconfig | sort) <(grep -E "^[^/ ]" Xcode-11.0/Warnings-XcodeDefaults.xcconfig | sort)
 ```
 
 *(replace the xcconfig files to compare in the command)*
