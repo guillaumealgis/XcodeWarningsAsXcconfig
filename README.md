@@ -87,7 +87,7 @@ You can then pick the settings you want to enable or not for your specific needs
 
 If you decide to include Clang Static Analyzer flags in your xcconfig (which is the default), remember to enable the Static Analyzer in your project.
 
-It can be done with the following flags (either in your xcconfig or Xcode project): 
+It can be done with the following flags (either in your xcconfig or Xcode project):
 
 ```bash
 RUN_CLANG_STATIC_ANALYZER // YES | NO
@@ -115,7 +115,7 @@ diff <(grep -E "^[^/ ]" Xcode-7.3/Warnings-XcodeDefaults.xcconfig | sort) <(grep
 
 ## Contributing
 
-All PRs are welcome, just try to stick to the 80 cols rule and respect PEP-8.
+All PRs are welcome, just try to respect PEP-8, and make sure the code is formatted using [Black](https://github.com/psf/black).
 
 The hand-picked values for the `--defaults strict` flag are really open to change (see the first few line of the script), I'd be super happy to get feedback on real-world results of using these.
 
