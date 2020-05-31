@@ -28,3 +28,6 @@ export_settings_with_defaults clang
 export_settings_with_defaults xcode
 export_settings_with_defaults strict
 export_settings_with_defaults aggressive
+
+echo
+echo "Wrote all xcconfig files to $XCODE_FOLDER/"

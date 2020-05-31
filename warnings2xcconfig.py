@@ -380,9 +380,16 @@ class ClangAnalyzerFlag:
 
 
 class ClangHelpParser:
-    def __init__(self, clang_bin_path, all_xspec_options=None):
+    def __init__(
+        self,
+        clang_bin_path,
+        help_flag,
+        all_xspec_options=None,
+        include_localization_flags=True,
+    ):
         self.clang_bin_path = clang_bin_path
-        self.include_localization_flags = True
+        self.help_flag = help_flag
+        self.include_localization_flags = include_localization_flags
 
         # Extract the command line flags from all build settings we already
         # have so we don't repeat the same options twice when building
@@ -398,9 +405,7 @@ class ClangHelpParser:
         self.flags = []
 
     def parse_help(self):
-        clang_help = check_output(
-            [self.clang_bin_path, "-cc1", "-analyzer-checker-help"]
-        )
+        clang_help = check_output([self.clang_bin_path, "-cc1", self.help_flag])
         clang_help = clang_help.decode(STDOUT_ENCODING)
 
         for line in clang_help.splitlines():
@@ -593,6 +598,12 @@ def parse_script_args():
         help="don't include Clang Analyzer checker flags in the output",
     )
     parser.add_argument(
+        "--analyzer-alpha",
+        dest="analyzer_alpha_flags",
+        action="store_true",
+        help="include Clang Analyzer alpha (in-development) checker flags in the output",
+    )
+    parser.add_argument(
         "--no-localizability",
         dest="localizability",
         action="store_false",
@@ -638,11 +649,7 @@ def xcspec_path(xcode_path, xcplugin, xcspec=None):
     if not xcspec:
         xcspec = xcplugin
 
-    path_template = (
-        "Contents/PlugIns/Xcode3Core.ideplugin/Contents/"
-        "SharedSupport/Developer/Library/Xcode/Plug-ins/"
-        "{}.xcplugin/Contents/Resources/{}.xcspec"
-    )
+    path_template = "Contents/PlugIns/Xcode3Core.ideplugin/Contents/SharedSupport/Developer/Library/Xcode/Plug-ins/{}.xcplugin/Contents/Resources/{}.xcspec"
     rel_path = path_template.format(xcplugin, xcspec)
     full_path = path.join(xcode_path, rel_path)
 
@@ -650,9 +657,7 @@ def xcspec_path(xcode_path, xcplugin, xcspec=None):
 
 
 def default_toolchain_bin_path(xcode_path, bin_name):
-    path_template = (
-        "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/" "usr/bin/{}"
-    )
+    path_template = "Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/{}"
     rel_path = path_template.format(bin_name)
     full_path = path.join(xcode_path, rel_path)
 
@@ -702,13 +707,28 @@ def main():
 
     load_xcode_defaults(args.xcode_path, options_groups)
 
-    analyzer_flags = None
+    all_xspec_options = list(flatmap(lambda g: g.options, options_groups))
+
+    analyzer_flags = []
     if args.analyzer_flags:
-        all_xspec_options = list(flatmap(lambda g: g.options, options_groups))
         clang_bin_path = default_toolchain_bin_path(args.xcode_path, "clang")
-        help_parser = ClangHelpParser(clang_bin_path, all_xspec_options)
-        help_parser.include_localization_flags = args.localizability
-        analyzer_flags = help_parser.parse_help()
+        help_parser = ClangHelpParser(
+            clang_bin_path,
+            help_flag="-analyzer-checker-help",
+            all_xspec_options=all_xspec_options,
+            include_localization_flags=args.localizability,
+        )
+        analyzer_flags += help_parser.parse_help()
+
+    if args.analyzer_flags and args.analyzer_alpha_flags:
+        clang_bin_path = default_toolchain_bin_path(args.xcode_path, "clang")
+        help_parser = ClangHelpParser(
+            clang_bin_path,
+            help_flag="-analyzer-checker-help-alpha",
+            all_xspec_options=all_xspec_options,
+            include_localization_flags=args.localizability,
+        )
+        analyzer_flags += help_parser.parse_help()
 
     xcode_version = parse_xcode_version(args.xcode_path)
     xcconfig = generate_xcconfig(
