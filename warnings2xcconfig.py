@@ -520,14 +520,20 @@ def analyzer_flags_as_xcconfig(analyzer_flags, add_doc, prefix, use_new_syntax):
 
 
 def generate_xcconfig(
-    optgroups, analyzer_flags, default_values, add_doc, prefix, use_new_syntax
+    xcode_version,
+    optgroups,
+    analyzer_flags,
+    default_values,
+    add_doc,
+    prefix,
+    use_new_syntax,
 ):
     # pylint: disable=too-many-arguments
     # This function does a lot, and it might be better to break it down a bit.
     # For now accept that it needs all these inputs and silence the warning.
 
     header = (
-        "// Generated using XcodeWarningsAsXcconfig\n"
+        f"// Generated using XcodeWarningsAsXcconfig for Xcode {xcode_version}\n"
         "// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig\n"
         "\n"
     )
@@ -653,6 +659,18 @@ def default_toolchain_bin_path(xcode_path, bin_name):
     return full_path
 
 
+def parse_xcode_version(xcode_path):
+    xcodebuild = f"{xcode_path}/Contents/Developer/usr/bin/xcodebuild"
+    output = check_output([xcodebuild, "-version"])
+    output = output.decode(STDOUT_ENCODING)
+    version, build = output.splitlines()
+    version = version.replace("Xcode", "").strip()
+    build = build.replace("Build version", "").strip()
+    xcode_version = f"{version} ({build})"
+
+    return xcode_version
+
+
 def main():
     args = parse_script_args()
 
@@ -692,7 +710,9 @@ def main():
         help_parser.include_localization_flags = args.localizability
         analyzer_flags = help_parser.parse_help()
 
+    xcode_version = parse_xcode_version(args.xcode_path)
     xcconfig = generate_xcconfig(
+        xcode_version,
         options_groups,
         analyzer_flags,
         default_values=args.defaults,
