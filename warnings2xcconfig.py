@@ -53,7 +53,14 @@ AGGRESSIVE_DEFAULTS_EXCEPTIONS = {
 }
 
 # Those are build settings we found in Xcode files but should stay untouched
-INGORED_BUILD_SETTINGS = ["CLANG_INDEX_STORE_ENABLE"]
+INGORED_BUILD_SETTINGS = [
+    "CLANG_INDEX_STORE_ENABLE",
+    # The sanitizers should be enabled on a per-build basis. It makes little
+    # sense to include these in a xcconfig file.
+    "CLANG_ADDRESS_SANITIZER",
+    "CLANG_THREAD_SANITIZER",
+    "CLANG_UNDEFINED_BEHAVIOR_SANITIZER",
+]
 
 # Clang Analyzer flags which are either too noisy, returns too much
 # false-positives, or are already included in Xcode build settings
@@ -214,6 +221,8 @@ class XcspecOption:
 
             value = "// {}".format(value)
 
+        assert value is not None
+
         return value
 
     @property
@@ -327,6 +336,9 @@ class XSpecParser:
 
     def is_option_valid(self, xcspec_option):
         if xcspec_option.name in INGORED_BUILD_SETTINGS:
+            return False
+
+        if xcspec_option.name.startswith("__"):
             return False
 
         if xcspec_option.name.endswith("EXPERIMENTAL"):
