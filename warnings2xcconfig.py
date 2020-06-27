@@ -335,13 +335,11 @@ class XSpecParser:
         return list(options_groups.values())
 
     def is_option_valid(self, xcspec_option):
-        if xcspec_option.name in INGORED_BUILD_SETTINGS:
-            return False
-
-        if xcspec_option.name.startswith("__"):
-            return False
-
-        if xcspec_option.name.endswith("EXPERIMENTAL"):
+        if (
+            xcspec_option.name in INGORED_BUILD_SETTINGS
+            or xcspec_option.name.startswith("__")
+            or xcspec_option.name.endswith("EXPERIMENTAL")
+        ):
             return False
 
         if xcspec_option.type in ["Path", "String"]:
@@ -661,7 +659,10 @@ def xcspec_path(xcode_path, xcplugin, xcspec=None):
     if not xcspec:
         xcspec = xcplugin
 
-    path_template = "Contents/PlugIns/Xcode3Core.ideplugin/Contents/SharedSupport/Developer/Library/Xcode/Plug-ins/{}.xcplugin/Contents/Resources/{}.xcspec"
+    path_template = (
+        "Contents/PlugIns/Xcode3Core.ideplugin/Contents/SharedSupport/"
+        "Developer/Library/Xcode/Plug-ins/{}.xcplugin/Contents/Resources/{}.xcspec"
+    )
     rel_path = path_template.format(xcplugin, xcspec)
     full_path = path.join(xcode_path, rel_path)
 
