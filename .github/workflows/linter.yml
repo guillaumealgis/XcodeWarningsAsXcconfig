@@ -1,0 +1,33 @@
+name: Linter
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Setup Linters
+        run: pip install -r requirements_test.txt
+
+      - name: Pylint
+        run: pylint *.py
+
+      - name: Black Code Formatter
+        run: black --check *.py
+
+      - name: Flake8
+        run: flake8 *.py
+
