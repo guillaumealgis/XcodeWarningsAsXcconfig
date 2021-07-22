@@ -11,7 +11,7 @@ from os import path
 from subprocess import check_output, check_call
 
 # These settings are used for the 'strict' defaults style.
-# All other settings values not explicitely defined here are inherited from
+# All other settings values not explicitly defined here are inherited from
 # the 'aggressive' style.
 # The goal is to get as strict as possible, without making day-to-day
 # development with these warnings a nightmare. This is intended to be
@@ -269,6 +269,7 @@ class XSpecParser:
         self._xcspec_file.close()
 
     def _open_xcspec(self, file_path):
+        # pylint: disable=consider-using-with
         self._xcspec_file = tempfile.NamedTemporaryFile()
 
         # Apple uses the old NeXTSTEP format for its xcspec, convert it to
@@ -346,7 +347,7 @@ class XSpecParser:
             return False
 
         # Never include options depending on an user defined value
-        if any(["$(value)" in arg for arg in xcspec_option.command_line_args]):
+        if any("$(value)" in arg for arg in xcspec_option.command_line_args):
             return False
 
         is_localization_option = "LOCALIZABILITY" in xcspec_option.name.upper()
