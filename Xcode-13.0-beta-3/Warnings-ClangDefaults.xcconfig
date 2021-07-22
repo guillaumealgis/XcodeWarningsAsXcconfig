@@ -1,0 +1,245 @@
+// Generated using XcodeWarningsAsXcconfig for Xcode 13.0 (13A5192j)
+// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig
+
+// Apple Clang - Language
+GCC_ENABLE_TRIGRAPHS = NO
+
+// Apple Clang - Language - Modules
+CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO
+CLANG_MODULES_DISABLE_PRIVATE_WARNING = NO
+
+// Apple Clang - Others
+CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = NO
+GCC_WARN_MULTIPLE_DEFINITION_TYPES_FOR_SELECTOR = NO
+
+// Apple Clang - Undefined Behavior Sanitizer
+CLANG_UNDEFINED_BEHAVIOR_SANITIZER_INTEGER = NO
+CLANG_UNDEFINED_BEHAVIOR_SANITIZER_NULLABILITY = NO
+
+// Apple Clang - Warnings - All languages
+CLANG_WARN_ASSIGN_ENUM = NO
+CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = NO
+CLANG_WARN_BOOL_CONVERSION = $(CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION)
+CLANG_WARN_COMMA = NO
+CLANG_WARN_COMPLETION_HANDLER_MISUSE = NO
+CLANG_WARN_CONSTANT_CONVERSION = $(CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION)
+CLANG_WARN_DOCUMENTATION_COMMENTS = NO
+CLANG_WARN_EMPTY_BODY = NO
+CLANG_WARN_ENUM_CONVERSION = $(CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION)
+CLANG_WARN_FLOAT_CONVERSION = $(CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION)
+CLANG_WARN_FRAMEWORK_INCLUDE_PRIVATE_FROM_PUBLIC = NO
+CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO
+CLANG_WARN_INFINITE_RECURSION = NO
+CLANG_WARN_INT_CONVERSION = $(CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION)
+CLANG_WARN_NON_LITERAL_NULL_CONVERSION = $(CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION)
+CLANG_WARN_PRAGMA_PACK = YES
+CLANG_WARN_PRIVATE_MODULE = YES
+CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO
+CLANG_WARN_SEMICOLON_BEFORE_METHOD_BODY = NO
+CLANG_WARN_STRICT_PROTOTYPES = NO
+CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO
+CLANG_WARN_UNGUARDED_AVAILABILITY = YES
+CLANG_WARN_UNREACHABLE_CODE = NO
+GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = NO
+GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = NO
+GCC_WARN_64_TO_32_BIT_CONVERSION = NO
+GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES
+GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = NO
+GCC_WARN_ABOUT_MISSING_NEWLINE = NO
+GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO
+GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES
+GCC_WARN_ABOUT_RETURN_TYPE = NO
+GCC_WARN_CHECK_SWITCH_STATEMENTS = YES
+GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO
+GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO
+GCC_WARN_MISSING_PARENTHESES = YES
+GCC_WARN_SHADOW = NO
+GCC_WARN_SIGN_COMPARE = NO
+GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES
+GCC_WARN_UNINITIALIZED_AUTOS = NO
+GCC_WARN_UNKNOWN_PRAGMAS = NO
+GCC_WARN_UNUSED_FUNCTION = NO
+GCC_WARN_UNUSED_LABEL = NO
+GCC_WARN_UNUSED_PARAMETER = NO
+GCC_WARN_UNUSED_VALUE = YES
+GCC_WARN_UNUSED_VARIABLE = NO
+
+// Apple Clang - Warnings - C++
+CLANG_WARN_ATOMIC_IMPLICIT_SEQ_CST = NO
+CLANG_WARN_CXX0X_EXTENSIONS = NO
+CLANG_WARN_DELETE_NON_VIRTUAL_DTOR = YES
+CLANG_WARN_RANGE_LOOP_ANALYSIS = NO
+CLANG_WARN_SUSPICIOUS_MOVE = NO
+CLANG_WARN_VEXING_PARSE = YES
+CLANG_WARN__EXIT_TIME_DESTRUCTORS = NO
+GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO = YES
+GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = NO
+GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO
+
+// Apple Clang - Warnings - Objective C
+CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO
+CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES
+CLANG_WARN_MISSING_NOESCAPE = YES
+CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = NO
+CLANG_WARN_OBJC_INTERFACE_IVARS = NO
+CLANG_WARN_OBJC_LITERAL_CONVERSION = $(CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION)
+CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = NO
+CLANG_WARN_OBJC_ROOT_CLASS = YES
+CLANG_WARN__DUPLICATE_METHOD_MATCH = NO
+GCC_WARN_ALLOW_INCOMPLETE_PROTOCOL = YES
+GCC_WARN_STRICT_SELECTOR_MATCH = NO
+GCC_WARN_UNDECLARED_SELECTOR = NO
+
+// Apple Clang - Warnings - Objective C and ARC
+CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = NO
+CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = NO
+CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = NO
+CLANG_WARN__ARC_BRIDGE_CAST_NONARC = YES
+
+// Apple Clang - Warnings - Warning Policies
+GCC_TREAT_WARNINGS_AS_ERRORS = NO
+GCC_WARN_INHIBIT_ALL_WARNINGS = NO
+GCC_WARN_PEDANTIC = NO
+
+// Static Analysis - Analysis Policy
+CLANG_STATIC_ANALYZER_MODE = shallow
+CLANG_STATIC_ANALYZER_MODE_ON_ANALYZE_ACTION = deep
+RUN_CLANG_STATIC_ANALYZER = NO
+
+// Static Analysis - Generic Issues
+CLANG_ANALYZER_DIVIDE_BY_ZERO = YES
+CLANG_ANALYZER_MEMORY_MANAGEMENT = $(CLANG_ANALYZER_MALLOC)
+CLANG_ANALYZER_NONNULL = YES_NONAGGRESSIVE
+CLANG_ANALYZER_NULL_DEREFERENCE = YES
+CLANG_TIDY_BUGPRONE_ASSERT_SIDE_EFFECT = YES
+CLANG_TIDY_BUGPRONE_INFINITE_LOOP = YES
+
+// Static Analysis - Issues - Apple APIs
+CLANG_ANALYZER_GCD = YES
+CLANG_ANALYZER_GCD_PERFORMANCE = NO
+CLANG_ANALYZER_LIBKERN_RETAIN_COUNT = YES
+CLANG_ANALYZER_LOCALIZABILITY_EMPTY_CONTEXT = NO
+CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = NO
+CLANG_ANALYZER_MIG_CONVENTIONS = YES
+CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES
+CLANG_ANALYZER_OBJC_COLLECTIONS = YES
+CLANG_ANALYZER_OBJC_NSCFERROR = YES
+CLANG_ANALYZER_OSOBJECT_C_STYLE_CAST = NO
+
+// Static Analysis - Issues - Objective C
+CLANG_ANALYZER_OBJC_ATSYNC = YES
+CLANG_ANALYZER_OBJC_DEALLOC = YES
+CLANG_ANALYZER_OBJC_GENERICS = YES
+CLANG_ANALYZER_OBJC_INCOMP_METHOD_TYPES = YES
+CLANG_ANALYZER_OBJC_RETAIN_COUNT = YES
+CLANG_ANALYZER_OBJC_SELF_INIT = YES
+CLANG_ANALYZER_OBJC_UNUSED_IVARS = YES
+
+// Static Analysis - Issues - Security
+CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = NO
+CLANG_ANALYZER_SECURITY_INSECUREAPI_GETPW_GETS = YES
+CLANG_ANALYZER_SECURITY_INSECUREAPI_MKSTEMP = YES
+CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = NO
+CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = NO
+CLANG_ANALYZER_SECURITY_INSECUREAPI_UNCHECKEDRETURN = YES
+CLANG_ANALYZER_SECURITY_INSECUREAPI_VFORK = YES
+CLANG_ANALYZER_SECURITY_KEYCHAIN_API = YES
+
+// Static Analysis - Others
+CLANG_ANALYZER_ALTERNATE_EDGES = YES
+CLANG_ANALYZER_MALLOC = YES
+CLANG_ANALYZER_REPORT_MAIN_SOURCE_FILE = YES
+
+// Static Analysis - SACPlusPlusCheckers
+CLANG_ANALYZER_USE_AFTER_MOVE = YES_AGGRESSIVE
+CLANG_TIDY_BUGPRONE_MOVE_FORWARDING_REFERENCE = YES
+
+// Static Analysis - SAUnusedCodeCheckers
+CLANG_ANALYZER_DEADCODE_DEADSTORES = YES
+CLANG_TIDY_BUGPRONE_REDUNDANT_BRANCH_CONDITION = NO
+CLANG_TIDY_MISC_REDUNDANT_EXPRESSION = NO
+
+// Swift Compiler - Warnings Policies
+SWIFT_SUPPRESS_WARNINGS = NO
+SWIFT_TREAT_WARNINGS_AS_ERRORS = NO
+
+// Clang Analyzer Flags
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.CallAndMessage
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.DivideZero
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.NonNullParamChecker
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.NullDereference
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.StackAddressEscape
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.UndefinedBinaryOperatorResult
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.VLASize
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.uninitialized.ArraySubscript
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.uninitialized.Assign
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.uninitialized.Branch
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.uninitialized.CapturedBlockVariable
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang core.uninitialized.UndefReturn
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang cplusplus.InnerPointer
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang cplusplus.Move
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang cplusplus.NewDelete
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang cplusplus.NewDeleteLeaks
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang cplusplus.PlacementNew
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang cplusplus.PureVirtualCall
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang deadcode.DeadStores
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang fuchsia.HandleChecker
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang nullability.NullPassedToNonnull
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang nullability.NullReturnedFromNonnull
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang nullability.NullableDereferenced
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang nullability.NullablePassedToNonnull
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang nullability.NullableReturnedFromNonnull
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang optin.cplusplus.UninitializedObject
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang optin.cplusplus.VirtualCall
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang optin.mpi.MPI-Checker
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang optin.performance.Padding
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang optin.portability.UnixAPI
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.API
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.MIG
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.NumberObjectConversion
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.OSObjectRetainCount
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.ObjCProperty
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.SecKeychainAPI
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.AtSync
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.AutoreleaseWrite
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.ClassRelease
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.Dealloc
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.IncompatibleMethodTypes
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.Loops
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.MissingSuperCall
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.NSAutoreleasePool
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.NSError
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.NilArg
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.NonNilReturnValue
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.ObjCGenerics
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.RetainCount
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.RunLoopAutoreleaseLeak
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.SelfInit
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.SuperDealloc
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.UnusedIvars
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.cocoa.VariadicMethodTypes
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.coreFoundation.CFError
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.coreFoundation.CFNumber
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.coreFoundation.CFRetainRelease
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.coreFoundation.containers.OutOfBounds
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang osx.coreFoundation.containers.PointerSizedValues
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang security.insecureAPI.bcmp
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang security.insecureAPI.bcopy
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang security.insecureAPI.bzero
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang security.insecureAPI.decodeValueOfObjCType
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang unix.API
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang unix.Malloc
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang unix.MallocSizeof
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang unix.MismatchedDeallocator
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang unix.Vfork
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang unix.cstring.BadSizeArg
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang unix.cstring.NullArg
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang valist.CopyToSelf
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang valist.Uninitialized
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang valist.Unterminated
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang webkit.NoUncountedMemberChecker
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang webkit.RefCntblBaseVirtualDtor
+WAX_ANALYZER_FLAGS = $(inherited) -Xclang -analyzer-checker -Xclang webkit.UncountedLambdaCapturesChecker
+
+WARNING_CFLAGS = $(inherited) $(WAX_ANALYZER_FLAGS)
