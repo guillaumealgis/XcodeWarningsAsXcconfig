@@ -125,7 +125,7 @@ class XcspecOptionsGroup:
         return name
 
     def format_for_xcconfig(self, default_values=None, add_doc=False):
-        xcconfig_string = "// {}\n".format(self.display_name)
+        xcconfig_string = f"// {self.display_name}\n"
 
         sorted_options = sorted(self.options, key=lambda o: o.name)
 
@@ -167,8 +167,9 @@ class XcspecOption:
             default_value = self.aggressive_default_enum_value(self.values)
 
         if default_value is None:
-            msg = "Unknown default value for {} (Type : {}; Values : {})".format(
-                self.name, self.type, self.values
+            msg = (
+                f"Unknown default value for {self.name} "
+                f"(Type : {self.type}; Values : {self.values})"
             )
             raise NotImplementedError(msg)
 
@@ -219,7 +220,7 @@ class XcspecOption:
             else:
                 value = self.type
 
-            value = "// {}".format(value)
+            value = f"// {value}"
 
         assert value is not None
 
@@ -253,9 +254,9 @@ class XcspecOption:
         if add_doc and self.description:
             name = self.display_name
             doc = self.description
-            opt_str += "// {}: {}\n".format(name, doc)
+            opt_str += f"// {name}: {doc}\n"
 
-        opt_str += "{} = {}\n".format(self.name, value)
+        opt_str += f"{self.name} = {value}\n"
 
         return opt_str
 
@@ -288,7 +289,7 @@ class XSpecParser:
 
         if not xcspec_tool:
             raise Exception(
-                "Found no tool with identifier {} in " "xcspec".format(tool_identifier)
+                f"Found no tool with identifier {tool_identifier} in " "xcspec"
             )
 
         # Inherit properties of the 'BasedOn' tool, if needed
@@ -377,15 +378,15 @@ class ClangAnalyzerFlag:
         self.doc = doc
 
     def format_for_xcconfig(self, varname, add_doc, use_new_syntax):
-        flag_str = "-Xclang -analyzer-checker -Xclang {}".format(self.name)
+        flag_str = f"-Xclang -analyzer-checker -Xclang {self.name}"
 
         if not use_new_syntax:
             return flag_str
 
         out = ""
         if add_doc:
-            out += "// %s\n" % self.doc
-        out += "%s = $(inherited) %s" % (varname, flag_str)
+            out += f"// {self.doc}\n"
+        out += f"{varname} = $(inherited) {flag_str}"
 
         return out
 
@@ -524,7 +525,7 @@ def analyzer_flags_as_xcconfig(analyzer_flags, add_doc, prefix, use_new_syntax):
         # in one bloc before the flags.
         if add_doc:
             for flag in analyzer_flags:
-                out += "// {}: {}\n".format(flag.name, flag.doc)
+                out += f"// {flag.name}: {flag.doc}\n"
 
         out += varname + " = "
         out += " ".join(formatted_flags)
