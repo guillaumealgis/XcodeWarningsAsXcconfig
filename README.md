@@ -73,7 +73,7 @@ For example:
 ```bash
 $ python warnings2xcconfig.py --defaults none
 // Generated using XcodeWarningsAsXcconfig
-// https://github.com/guillaume-algis/XcodeWarningsAsXcconfig
+// https://github.com/guillaumealgis/XcodeWarningsAsXcconfig
 
 // Apple LLVM 7.1 - Warnings - Objective C and ARC
 CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = // YES | NO
